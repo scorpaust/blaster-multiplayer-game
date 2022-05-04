@@ -40,6 +40,8 @@ protected:
 
 	void EquipButtonPressed();
 
+	void CrouchButtonPressed();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
