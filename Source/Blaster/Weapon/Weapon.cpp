@@ -10,6 +10,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Casing.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -150,7 +151,9 @@ void AWeapon::Fire(const FVector& HitTarget)
 
 			if (World)
 			{
-				World->SpawnActor<ACasing>(CasingClass, SocketTransform.GetLocation(), SocketTransform.GetRotation().Rotator());
+				CasingRotation = FRotator(UKismetMathLibrary::RandomFloatInRange(0.f, 90.f), 0.f, 0.f);
+
+				World->SpawnActor<ACasing>(CasingClass, SocketTransform.GetLocation(), CasingRotation);
 			}
 		}
 		
