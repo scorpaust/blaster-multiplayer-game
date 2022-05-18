@@ -109,5 +109,9 @@ public:
 
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
 	AWeapon* GetEquippedWeapon();
+
+	FVector GetHitTarget() const;
 };
