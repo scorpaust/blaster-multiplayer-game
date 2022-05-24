@@ -42,6 +42,8 @@ protected:
 
 	void FireButtonPressed(bool bPressed);
 
+	void Fire();
+
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
@@ -106,6 +108,18 @@ private:
 	float CurrentFOV;
 
 	void InterpFOV(float DeltaTime);
+
+	/**
+	* Automatic Fire
+	*/
+
+	bool bCanFire = true;
+
+	FTimerHandle FireTimer;
+
+	void StartFireTimer();
+
+	void FireTimerFinished();
 
 public:	
 	

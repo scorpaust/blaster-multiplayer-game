@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "Blaster/PlayerController/BlasterPlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "TimerManager.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -33,7 +34,6 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UCombatComponent, bAiming);
 }
-
 
 // Called when the game starts
 void UCombatComponent::BeginPlay()
@@ -70,6 +70,101 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		SetHUDCrosshairs(DeltaTime);
 
 		InterpFOV(DeltaTime);
+	}
+}
+
+void UCombatComponent::FireButtonPressed(bool bPressed)
+{
+	bFireButtonPressed = bPressed;
+
+	if (bFireButtonPressed && EquippedWeapon)
+	{
+		Fire();
+	}
+}
+
+void UCombatComponent::Fire()
+{
+	if (bCanFire)
+	{
+		bCanFire = false;
+		
+		ServerFire(HitTarget);
+
+		if (EquippedWeapon)
+		{
+			CrosshairShootingFactor = 0.75f;
+		}
+
+		StartFireTimer();
+	}
+}
+
+void UCombatComponent::StartFireTimer()
+{
+	if (EquippedWeapon == nullptr || Character == nullptr) return;
+
+	Character->GetWorldTimerManager().SetTimer(FireTimer, this, &UCombatComponent::FireTimerFinished, EquippedWeapon->FireDelay);
+}
+
+void UCombatComponent::FireTimerFinished()
+{
+	if (EquippedWeapon == nullptr) return;
+
+	bCanFire = true;
+
+	if (bFireButtonPressed && EquippedWeapon->bAutomatic)
+	{
+		Fire();
+	}
+}
+
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+{
+	MulticastFire(TraceHitTarget);
+}
+
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+{
+	if (EquippedWeapon == nullptr) return;
+
+	if (Character)
+	{
+		Character->PlayFireMontage(bAiming);
+
+		EquippedWeapon->Fire(TraceHitTarget);
+	}
+}
+
+void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
+{
+	if (Character == nullptr || WeaponToEquip == nullptr) return;
+
+	EquippedWeapon = WeaponToEquip;
+
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+
+	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+
+	if (HandSocket)
+	{
+		HandSocket->AttachActor(EquippedWeapon, Character->GetMesh());
+	}
+
+	EquippedWeapon->SetOwner(Character);
+
+	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+
+	Character->bUseControllerRotationYaw = true;
+}
+
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if (EquippedWeapon && Character)
+	{
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+
+		Character->bUseControllerRotationYaw = true;
 	}
 }
 
@@ -179,35 +274,6 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 	}
 }
 
-void UCombatComponent::OnRep_EquippedWeapon()
-{
-	if (EquippedWeapon && Character)
-	{
-		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-
-		Character->bUseControllerRotationYaw = true;
-	}
-}
-
-void UCombatComponent::FireButtonPressed(bool bPressed)
-{
-	bFireButtonPressed = bPressed;
-
-	if (bFireButtonPressed)
-	{
-		FHitResult HitResult;
-
-		TraceUnderCrosshairs(HitResult);
-
-		ServerFire(HitResult.ImpactPoint); 
-
-		if (EquippedWeapon)
-		{
-			CrosshairShootingFactor = 0.95f;
-		}
-	}
-}
-
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 {
 	FVector2D ViewportSize;
@@ -252,23 +318,6 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 
 }
 
-void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
-{
-	MulticastFire(TraceHitTarget);
-}
-
-void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
-{
-	if (EquippedWeapon == nullptr) return;
-
-	if (Character)
-	{
-		Character->PlayFireMontage(bAiming);
-
-		EquippedWeapon->Fire(TraceHitTarget);
-	}
-}
-
 void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 {
 	bAiming = bIsAiming;
@@ -279,25 +328,5 @@ void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 	}
 }
 
-void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
-{
-	if (Character == nullptr || WeaponToEquip == nullptr) return;
 
-	EquippedWeapon = WeaponToEquip;
-
-	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-
-	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-
-	if (HandSocket)
-	{
-		HandSocket->AttachActor(EquippedWeapon, Character->GetMesh());
-	}
-
-	EquippedWeapon->SetOwner(Character);
-
-	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-
-	Character->bUseControllerRotationYaw = true;
-}
 
