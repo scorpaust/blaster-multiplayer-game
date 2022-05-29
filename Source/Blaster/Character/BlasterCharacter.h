@@ -81,6 +81,9 @@ protected:
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
 
+	// Poll for any relevant classes and initialize our HUD
+	void PollInit();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -206,6 +209,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	class USoundCue* ElimBotSound;
 
+	class ABlasterPlayerState* BlasterPlayerState;
+
 public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -225,6 +230,10 @@ public:
 	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 
 	FORCEINLINE bool IsEliminated() const { return bEliminated; }
+
+	FORCEINLINE float GetHealth() const { return Health; }
+
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 
 	AWeapon* GetEquippedWeapon();
 
