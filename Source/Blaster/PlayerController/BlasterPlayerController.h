@@ -20,6 +20,8 @@ public:
 
 	void SetHUDScore(float Score);
 
+	void SetHUDDefeats(int32 Defeats);
+
 	virtual void OnPossess(APawn* InPawn) override;
 
 protected:
@@ -28,5 +30,6 @@ protected:
 
 private:
 
+	UPROPERTY()
 	class ABlasterHUD* BlasterHUD;
 };
