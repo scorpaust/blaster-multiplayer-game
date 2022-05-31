@@ -11,6 +11,7 @@
 #include "Casing.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Blaster/PlayerController/BlasterPlayerController.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -117,6 +118,50 @@ void AWeapon::OnRep_WeaponState()
 	}
 }
 
+void AWeapon::SpendRound()
+{
+	Ammo -= 1;
+
+	SetHUDAmmo();
+}
+
+void AWeapon::OnRep_Ammo()
+{
+	SetHUDAmmo();
+}
+
+void AWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+
+	if (Owner == nullptr)
+	{
+		BlasterOwnerCharacter = nullptr;
+
+		BlasterOwnerController = nullptr;
+	}
+	else
+	{
+		SetHUDAmmo();
+	}
+}
+
+void AWeapon::SetHUDAmmo()
+{
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+
+	if (BlasterOwnerCharacter)
+	{
+		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlasterPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
+
+		if (BlasterOwnerController)
+		{
+			BlasterOwnerController->SetHUDWeaponAmmo(Ammo);
+		}
+	}
+}
+
+
 void AWeapon::SetWeaponState(EWeaponState State)
 {
 	WeaponState = State;
@@ -165,6 +210,8 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, WeaponState);
+
+	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::ShowPickupWidget(bool bShowWidget)
@@ -199,8 +246,9 @@ void AWeapon::Fire(const FVector& HitTarget)
 				World->SpawnActor<ACasing>(CasingClass, SocketTransform.GetLocation(), CasingRotation);
 			}
 		}
-		
 	}
+
+	SpendRound();
 }
 
 void AWeapon::Dropped()
@@ -212,5 +260,9 @@ void AWeapon::Dropped()
 	WeaponMesh->DetachFromComponent(DetachRules);
 
 	SetOwner(nullptr);
+
+	BlasterOwnerCharacter = nullptr;
+
+	BlasterOwnerController = nullptr;
 }
 

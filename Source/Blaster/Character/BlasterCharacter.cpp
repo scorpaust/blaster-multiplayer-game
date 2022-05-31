@@ -236,6 +236,12 @@ void ABlasterCharacter::Destroyed()
 
 void ABlasterCharacter::MulticastElim_Implementation()
 {
+
+	if (BlasterPlayerController)
+	{
+		BlasterPlayerController->SetHUDWeaponAmmo(0);
+	}
+
 	bEliminated = true;
 
 	PlayElimMontage();
