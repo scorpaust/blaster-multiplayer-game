@@ -120,7 +120,7 @@ void AWeapon::OnRep_WeaponState()
 
 void AWeapon::SpendRound()
 {
-	Ammo -= 1;
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
 
 	SetHUDAmmo();
 }
@@ -197,6 +197,11 @@ void AWeapon::SetWeaponState(EWeaponState State)
 
 			break;
 	}
+}
+
+bool AWeapon::IsEmpty()
+{
+	return Ammo <= 0;
 }
 
 // Called every frame
