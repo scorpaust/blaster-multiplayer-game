@@ -81,6 +81,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	bool bAutomatic = true;
 
+	UPROPERTY(EditAnywhere)
+	class USoundCue* EquipSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
