@@ -24,6 +24,8 @@ public:
 
 	void SetHUDWeaponAmmo(int32 Ammo);
 
+	void SetHUDWeaponTexture(UTexture2D* WeaponTexture);
+
 	void SetHUDCarriedAmmo(int32 Ammo);
 
 	virtual void OnPossess(APawn* InPawn) override;

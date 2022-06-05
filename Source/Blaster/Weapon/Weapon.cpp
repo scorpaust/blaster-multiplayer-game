@@ -161,6 +161,21 @@ void AWeapon::SetHUDAmmo()
 	}
 }
 
+void AWeapon::SetHUDWeaponTexture()
+{
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+
+	if (BlasterOwnerCharacter)
+	{
+		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlasterPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
+
+		if (BlasterOwnerController && WeaponTexture)
+		{
+			BlasterOwnerController->SetHUDWeaponTexture(WeaponTexture);
+		}
+	}
+}
+
 
 void AWeapon::SetWeaponState(EWeaponState State)
 {

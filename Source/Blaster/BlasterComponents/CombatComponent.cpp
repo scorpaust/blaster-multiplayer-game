@@ -224,6 +224,8 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	if (Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
+
+		Controller->SetHUDWeaponTexture(EquippedWeapon->GetWeaponTexture());
 	}
 
 	if (EquippedWeapon->EquipSound)

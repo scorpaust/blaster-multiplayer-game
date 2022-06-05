@@ -34,6 +34,8 @@ public:
 
 	void SetHUDAmmo();
 
+	void SetHUDWeaponTexture();
+
 	void ShowPickupWidget(bool bShowWidget);
 
 	virtual void Fire(const FVector& HitTarget);
@@ -138,6 +140,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
 
+	UPROPERTY(EditAnywhere)
+	UTexture2D* WeaponTexture;
+
 public:
 
 	void SetWeaponState(EWeaponState State);
@@ -155,6 +160,8 @@ public:
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }
 
 	FORCEINLINE int32 GetMagCapacity() const { return MagCapacity; }
+
+	FORCEINLINE UTexture2D* GetWeaponTexture() const { return WeaponTexture; }
 
 	bool IsEmpty();
 };
