@@ -37,4 +37,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UImage* WeaponImage;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* MatchCountDownText;
 };
