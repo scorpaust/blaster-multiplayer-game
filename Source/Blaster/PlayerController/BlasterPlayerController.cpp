@@ -236,9 +236,9 @@ void ABlasterPlayerController::SetHUDMatchCountDown(float CountDownTime)
 
 		if (bLastThirtySeconds)
 		{
-			FString CountDownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
-
 			FTimerHandle TimerHandle;
+
+			FString CountDownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
 
 			FSlateColor RedColor = FSlateColor(FLinearColor::Red);
 
@@ -422,7 +422,7 @@ void ABlasterPlayerController::HandleMatchHasStarted()
 
 	if (BlasterHUD)
 	{
-		BlasterHUD->AddCharacterOverlay();
+		if (BlasterHUD->CharacterOverlay == nullptr) BlasterHUD->AddCharacterOverlay();
 
 		if (BlasterHUD->Announcement)
 		{
