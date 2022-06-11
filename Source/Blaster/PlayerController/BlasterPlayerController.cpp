@@ -11,6 +11,9 @@
 #include "Blaster/HUD/Announcement.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blaster/BlasterComponents/CombatComponent.h"
+#include "Blaster/GameState/BlasterGameState.h"
+#include "Blaster/PlayerState/BlasterPlayerState.h"
 
 
 void ABlasterPlayerController::BeginPlay()
@@ -229,9 +232,38 @@ void ABlasterPlayerController::SetHUDMatchCountDown(float CountDownTime)
 
 		int32 Seconds = CountDownTime - (Minutes * 60);
 
-		FString CountDownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+		bool bLastThirtySeconds = Minutes == FMath::FloorToInt(0.f) && Seconds <= FMath::FloorToInt(30.f);
 
-		BlasterHUD->CharacterOverlay->MatchCountDownText->SetText(FText::FromString(CountDownText));
+		if (bLastThirtySeconds)
+		{
+			FString CountDownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+
+			FTimerHandle TimerHandle;
+
+			FSlateColor RedColor = FSlateColor(FLinearColor::Red);
+
+			BlasterHUD->CharacterOverlay->MatchCountDownText->SetColorAndOpacity(RedColor);
+
+			BlasterHUD->CharacterOverlay->MatchCountDownText->SetText(FText::FromString(CountDownText));
+
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+				{
+					BlasterHUD->CharacterOverlay->MatchCountDownText->SetVisibility(ESlateVisibility::Hidden);
+
+				}, .5f, false);
+
+			BlasterHUD->CharacterOverlay->MatchCountDownText->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			FString CountDownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+
+			FSlateColor WhiteColor = FSlateColor(FLinearColor::White);
+
+			BlasterHUD->CharacterOverlay->MatchCountDownText->SetColorAndOpacity(WhiteColor);
+
+			BlasterHUD->CharacterOverlay->MatchCountDownText->SetText(FText::FromString(CountDownText));
+		}
 	}
 }
 
@@ -417,7 +449,53 @@ void ABlasterPlayerController::HandleCooldown()
 
 			BlasterHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
 
-			BlasterHUD->Announcement->InfoText->SetText(FText());
+			ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
+
+			ABlasterPlayerState* BlasterPlayerState = GetPlayerState<ABlasterPlayerState>();
+
+			if (BlasterGameState && BlasterPlayerState)
+			{
+				TArray<ABlasterPlayerState*> TopPlayers = BlasterGameState->TopScoringPlayers;
+
+				FString InfoTextString;
+				
+				if (TopPlayers.Num() == 0)
+				{
+					InfoTextString = FString("There is no winner.");
+				}
+
+				else if (TopPlayers.Num() == 1 && TopPlayers[0] == BlasterPlayerState)
+				{
+					InfoTextString = FString("You are the winner!");
+				}
+
+				else if (TopPlayers.Num() == 1)
+				{
+					InfoTextString = FString::Printf(TEXT("Winner: \n%s"), *TopPlayers[0]->GetPlayerName());
+				}
+
+				else if (TopPlayers.Num() > 1)
+				{
+					InfoTextString = FString("Players tied for the win:\n");
+
+					for (auto TiedPlayer : TopPlayers)
+					{
+						InfoTextString.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
+					}
+				}
+
+				BlasterHUD->Announcement->InfoText->SetText(FText::FromString(InfoTextString));
+			}
+			
 		}
+	}
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn());
+
+	if (BlasterCharacter && BlasterCharacter->GetCombat())
+	{
+		BlasterCharacter->bDisableGameplay = true;
+
+		BlasterCharacter->GetCombat()->FireButtonPressed(false);
 	}
 }
