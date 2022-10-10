@@ -10,6 +10,8 @@
 
 void AShotgun::Fire(const FVector& HitTarget)
 {
+	AWeapon::Fire(HitTarget);
+
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	if (OwnerPawn == nullptr) return;
 	AController* InstigatorController = OwnerPawn->GetController();
@@ -19,6 +21,10 @@ void AShotgun::Fire(const FVector& HitTarget)
 	{
 		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
 		FVector Start = SocketTransform.GetLocation();
-		FVector End = TraceEndWithScatter(Start, HitTarget);
+
+		for (uint32 i; i < NumberOfPellets; i++)
+		{
+			FVector End = TraceEndWithScatter(Start, HitTarget);
+		}
 	}
 }
