@@ -164,4 +164,6 @@ public:
 	FORCEINLINE UTexture2D* GetWeaponTexture() const { return WeaponTexture; }
 
 	bool IsEmpty();
+
+	bool IsFull();
 };

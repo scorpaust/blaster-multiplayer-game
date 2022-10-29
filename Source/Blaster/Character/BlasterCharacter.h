@@ -262,6 +262,8 @@ public:
 
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 
+	FORCEINLINE UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
+
 	ECombatState GetCombatState() const;
 
 	AWeapon* GetEquippedWeapon();
