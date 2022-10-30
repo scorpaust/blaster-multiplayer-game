@@ -86,6 +86,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USoundCue* EquipSound;
 
+	/**
+	* Enable or disable Custom Depth
+	*/
+	void EnableCustomDepth(bool bEnable);
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
