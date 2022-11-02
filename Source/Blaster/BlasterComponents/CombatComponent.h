@@ -79,6 +79,18 @@ protected:
 
 	int32 AmountToReload();
 
+	void DropEquippedWeapon();
+
+	void AttachActorToRightHand(AActor* ActorToAttach);
+
+	void AttachActorToLeftHand(AActor* ActorToAttach);
+
+	void UpdateCarriedAmmo();
+
+	void PlayEquipWeaponSound();
+
+	void ReloadEmptyWeapon();
+
 private:
 
 	UPROPERTY()
