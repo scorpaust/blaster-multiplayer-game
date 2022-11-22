@@ -22,6 +22,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Blaster/PlayerState/BlasterPlayerState.h"
 #include "Blaster/Weapon/WeaponTypes.h"
+#include "Components/StaticMeshComponent.h"
 
 
 // Sets default values
@@ -77,6 +78,12 @@ ABlasterCharacter::ABlasterCharacter()
 	MinNetUpdateFrequency = 33.f;
 
 	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimelineComponent"));
+
+	AttachedGrenade = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Attached Grenade"));
+
+	AttachedGrenade->SetupAttachment(GetMesh(), FName("GrenadeSocket"));
+
+	AttachedGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
