@@ -34,6 +34,8 @@ public:
 
 	void SetHUDAnnouncementCountDown(float CountDownTime);
 
+	void SetHUDGrenades(int32 Grenades);
+
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void Tick(float DeltaTime) override;
@@ -122,4 +124,6 @@ private:
 	float HUDScore;
 
 	int32 HUDDefeats;
+
+	int32 HUDGrenades;
 };

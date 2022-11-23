@@ -40,6 +40,8 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 
 	DOREPLIFETIME(UCombatComponent, CombatState);
+
+	DOREPLIFETIME(UCombatComponent, Grenades);
 }
 
 // Called when the game starts
@@ -122,6 +124,8 @@ void UCombatComponent::Fire()
 
 void UCombatComponent::ThrowGrenade()
 {
+	if (Grenades == 0) return;
+
 	if (CombatState != ECombatState::ECS_Unoccupied || EquippedWeapon == nullptr) return;
 
 	CombatState = ECombatState::ECS_ThrowingGrenade;
@@ -138,6 +142,13 @@ void UCombatComponent::ThrowGrenade()
 	if (Character && !Character->HasAuthority())
 	{
 		ServerThrowGrenade();
+	}
+
+	if (Character && Character->HasAuthority())
+	{
+		Grenades = FMath::Clamp(Grenades - 1, 0, MaxGrenades);
+
+		UpdateHUDGrenades();
 	}
 }
 
@@ -446,6 +457,21 @@ void UCombatComponent::UpdateShotgunAmmoValues()
 	}
 }
 
+void UCombatComponent::OnRep_Grenades()
+{
+	UpdateHUDGrenades();
+}
+
+void UCombatComponent::UpdateHUDGrenades()
+{
+	Controller = Controller == nullptr ? Cast<ABlasterPlayerController>(Character->Controller) : Controller;
+
+	if (Controller)
+	{
+		Controller->SetHUDGrenades(Grenades);
+	}
+}
+
 void UCombatComponent::JumpToShotgunEnd()
 {
 	// Jump to ShotgunEnd Section
@@ -654,6 +680,8 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 
 void UCombatComponent::ServerThrowGrenade_Implementation()
 {
+	if (Grenades == 0) return;
+
 	CombatState = ECombatState::ECS_ThrowingGrenade;
 
 	if (Character)
@@ -664,6 +692,8 @@ void UCombatComponent::ServerThrowGrenade_Implementation()
 
 		ShowAttachedGrenade(true);
 	}
+
+	Grenades = FMath::Clamp(Grenades - 1, 0, MaxGrenades);
 }
 
 void UCombatComponent::ShowAttachedGrenade(bool bShowGrenade)
