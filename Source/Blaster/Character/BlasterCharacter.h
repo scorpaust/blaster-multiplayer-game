@@ -52,12 +52,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowSniperScopeWidget(bool bShowScope);
 
+	void UpdateHUDHealth();
+
 protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	void UpdateHUDHealth();
 
 	void MoveForward(float Value);
 
@@ -120,6 +120,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCombatComponent* Combat;
+
+	UPROPERTY(VisibleAnywhere)
+	class UBuffComponent* Buff;
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
@@ -185,7 +188,7 @@ private:
 	float Health = 100.f;
 
 	UFUNCTION()
-	void OnRep_Health();
+	void OnRep_Health(float LastHealth);
 
 	UPROPERTY()
 	class ABlasterPlayerController* BlasterPlayerController;
@@ -269,9 +272,13 @@ public:
 
 	FORCEINLINE float GetHealth() const { return Health; }
 
+	FORCEINLINE void SetHealth(float Amount) { Health = Amount; }
+
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 
 	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
+
+	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 
