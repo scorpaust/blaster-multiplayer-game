@@ -99,6 +99,8 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ABlasterCharacter, Health);
 
+	DOREPLIFETIME(ABlasterCharacter, Shield);
+
 	DOREPLIFETIME(ABlasterCharacter, bDisableGameplay);
 }
 
@@ -108,6 +110,8 @@ void ABlasterCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	UpdateHUDHealth();
+
+	UpdateHUDShield();
 
 	if (HasAuthority())
 	{
@@ -127,6 +131,16 @@ void ABlasterCharacter::UpdateHUDHealth()
 	if (BlasterPlayerController)
 	{
 		BlasterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
+void ABlasterCharacter::UpdateHUDShield()
+{
+	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+
+	if (BlasterPlayerController)
+	{
+		BlasterPlayerController->SetHUDShield(Shield, MaxShield);
 	}
 }
 
@@ -410,6 +424,16 @@ void ABlasterCharacter::MulticastElim_Implementation()
 	}
 }
 
+void ABlasterCharacter::OnRep_Shield(float LastShield)
+{
+	UpdateHUDShield();
+
+	if (Shield < LastShield)
+	{
+		PlayHitReactMontage();
+	}
+}
+
 void ABlasterCharacter::ElimTimerFinished()
 {
 	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
@@ -442,9 +466,29 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 {
 	if (bEliminated) return;
 
-	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	float DamageToHealth = Damage;
+
+	if (Shield > 0.f)
+	{
+		if (Shield >= Damage)
+		{
+			Shield = FMath::Clamp(Shield - Damage, 0.f, MaxShield);
+
+			DamageToHealth = 0.f;
+		}
+		else
+		{
+			DamageToHealth = FMath::Clamp(DamageToHealth - Shield, 0.f, Damage);
+
+			Shield = 0.f;
+		}
+	}
+
+	Health = FMath::Clamp(Health - DamageToHealth, 0.f, MaxHealth);
 
 	UpdateHUDHealth();
+
+	UpdateHUDShield();
 
 	PlayHitReactMontage();
 

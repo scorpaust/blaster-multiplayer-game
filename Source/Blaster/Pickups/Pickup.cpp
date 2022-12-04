@@ -54,10 +54,15 @@ APickup::APickup()
 void APickup::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (HasAuthority())
 	{
-		OverlapSphere->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereOverlap);
+		GetWorldTimerManager().SetTimer(
+			BindOverlapTimer,
+			this,
+			&APickup::BindOverlapTimerFinished,
+			BindOverlapTime
+		);
 	}
 }
 
@@ -100,5 +105,10 @@ void APickup::Destroyed()
 			GetActorRotation()
 		);
 	}
+}
+
+void APickup::BindOverlapTimerFinished()
+{
+	OverlapSphere->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereOverlap);
 }
 

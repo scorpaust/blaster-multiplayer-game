@@ -54,6 +54,8 @@ public:
 
 	void UpdateHUDHealth();
 
+	void UpdateHUDShield();
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -190,6 +192,19 @@ private:
 	UFUNCTION()
 	void OnRep_Health(float LastHealth);
 
+	/**
+	* Player Shield
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
+	float MaxShield = 100.f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Shield, EditAnywhere, Category = "Player Stats")
+	float Shield = 0.f;
+
+	UFUNCTION()
+	void OnRep_Shield(float LastShield);
+
 	UPROPERTY()
 	class ABlasterPlayerController* BlasterPlayerController;
 
@@ -272,9 +287,15 @@ public:
 
 	FORCEINLINE float GetHealth() const { return Health; }
 
+	FORCEINLINE float GetShield() const { return Shield; }
+
 	FORCEINLINE void SetHealth(float Amount) { Health = Amount; }
 
+	FORCEINLINE void SetShield(float Amount) { Shield = Amount; }
+
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+
+	FORCEINLINE float GetMaxShield() const { return MaxShield; }
 
 	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
 
