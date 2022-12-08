@@ -119,6 +119,10 @@ protected:
 
 	void RotateInPlace(float DeltaTime);
 
+	void DropOrDestroyWeapon(AWeapon* Weapon);
+
+	void DropOrDestroyWeapons();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)

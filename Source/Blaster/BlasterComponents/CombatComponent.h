@@ -28,6 +28,8 @@ public:
 
 	void EquipWeapon(class AWeapon* WeaponToEquip);
 
+	void SwapWeapons();
+
 	void Reload();
 
 	UFUNCTION(BlueprintCallable)
@@ -63,6 +65,13 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	UFUNCTION()
+	void OnRep_SecondaryWeapon();
+
+	void EquipPrimaryWeapon(AWeapon* WeaponToEquip);
+
+	void EquipSecondaryWeapon(AWeapon* WeaponToEquip);
+
 	void Fire();
 
 	void ThrowGrenade();
@@ -96,9 +105,11 @@ protected:
 
 	void AttachActorToLeftHand(AActor* ActorToAttach);
 
+	void AttachActorToBackpack(AActor* ActorToAttach);
+
 	void UpdateCarriedAmmo();
 
-	void PlayEquipWeaponSound();
+	void PlayEquipWeaponSound(AWeapon* WeaponToEquip);
 
 	void ReloadEmptyWeapon();
 
@@ -116,6 +127,9 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
+	AWeapon* SecondaryWeapon;
 
 	UPROPERTY(Replicated)
 	bool bAiming;
@@ -233,5 +247,7 @@ private:
 public:	
 	
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
+
+	bool ShouldSwapWeapons();
 		
 };
