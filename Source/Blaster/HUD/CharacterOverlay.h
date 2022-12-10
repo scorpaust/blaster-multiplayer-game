@@ -49,4 +49,10 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* GrenadeText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* WifiSignalImage;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* WifiSignalAnimation;
 };
