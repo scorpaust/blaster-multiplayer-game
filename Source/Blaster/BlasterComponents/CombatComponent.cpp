@@ -129,15 +129,50 @@ void UCombatComponent::Fire()
 	{
 		bCanFire = false;
 		
-		ServerFire(HitTarget);
-
 		if (EquippedWeapon)
 		{
 			CrosshairShootingFactor = 0.75f;
+
+			switch (EquippedWeapon->FireType)
+			{
+				case EFireType::EFT_Projectile:
+					FireProjectileWeapon();
+					break;
+				case EFireType::EFT_HitScan:
+					FireHitScanWeapon();
+					break;
+				case EFireType::EFT_Shotgun:
+					FireShotgun();
+					break;
+			}
 		}
 
 		StartFireTimer();
 	}
+}
+
+void UCombatComponent::FireProjectileWeapon()
+{
+	ServerFire(HitTarget);
+
+	LocalFire(HitTarget);
+}
+
+void UCombatComponent::FireHitScanWeapon()
+{
+	if (EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
+
+		ServerFire(HitTarget);
+
+		LocalFire(HitTarget);
+	}
+}
+
+void UCombatComponent::FireShotgun()
+{
+
 }
 
 void UCombatComponent::ThrowGrenade()
@@ -267,6 +302,13 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 }
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+{
+	if (Character && Character->IsLocallyControlled() && !Character->HasAuthority()) return;
+
+	LocalFire(TraceHitTarget);
+}
+
+void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 {
 	if (EquippedWeapon == nullptr) return;
 
@@ -402,6 +444,8 @@ bool UCombatComponent::ShouldSwapWeapons()
 
 void UCombatComponent::SwapWeapons()
 {
+	if (CombatState != ECombatState::ECS_Unoccupied) return;
+
 	AWeapon* TempWeapon = EquippedWeapon;
 
 	EquippedWeapon = SecondaryWeapon;
