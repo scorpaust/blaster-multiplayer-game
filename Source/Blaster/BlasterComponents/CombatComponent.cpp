@@ -16,6 +16,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "Blaster/Weapon/Projectile.h"
+#include "Blaster/Weapon/Shotgun.h"
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
@@ -172,6 +173,17 @@ void UCombatComponent::FireHitScanWeapon()
 
 void UCombatComponent::FireShotgun()
 {
+	AShotgun* Shotgun = Cast<AShotgun>(EquippedWeapon);
+
+	if (Shotgun)
+	{
+		TArray<FVector> HitTargets;
+
+		Shotgun->ShotgunTraceEndWithScatter(HitTarget, HitTargets);
+	}
+
+	
+
 
 }
 
