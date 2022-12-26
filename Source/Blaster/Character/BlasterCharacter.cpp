@@ -938,6 +938,13 @@ void ABlasterCharacter::StartDissolve()
 	}
 }
 
+bool ABlasterCharacter::IsLocallyReloading()
+{
+	if (Combat == nullptr) return false;
+
+	return Combat->bLocallyReloading;
+}
+
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {
 	if (OverlappingWeapon)

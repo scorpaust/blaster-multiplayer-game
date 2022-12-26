@@ -328,4 +328,6 @@ public:
 
 	FORCEINLINE UStaticMeshComponent* GetAttachedGrenade() const { return AttachedGrenade; }
 
+	bool IsLocallyReloading();
+
 };

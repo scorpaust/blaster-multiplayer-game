@@ -53,6 +53,8 @@ public:
 
 	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
 
+	bool bLocallyReloading = false;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
