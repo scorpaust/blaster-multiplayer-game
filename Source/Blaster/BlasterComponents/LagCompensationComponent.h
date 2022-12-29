@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ActorComponent.h"
+#include "Components/ActorComponent.h"
 #include "LagCompensationComponent.generated.h"
 
 

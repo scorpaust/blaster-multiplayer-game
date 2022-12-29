@@ -72,6 +72,65 @@ public:
 
 	void SpawnDefaultWeapon();
 
+
+	/**
+	* Hit boxes used for server side rewind
+	*/
+
+	UPROPERTY(EditAnywhere)
+	class UBoxComponent* Head;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Pelvis;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Spine_02;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Spine_03;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Upperarm_l;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Upperarm_r;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Lowerarm_l;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Lowerarm_r;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Hand_l;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Hand_r;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Backpack;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Blanket;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Thigh_l;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Thigh_r;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Calf_l;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Calf_r;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Foot_l;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Foot_r;
+
 protected:
 
 	// Called when the game starts or when spawned
