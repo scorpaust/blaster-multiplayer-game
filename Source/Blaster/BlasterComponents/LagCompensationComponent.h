@@ -49,11 +49,15 @@ public:
 
 	void ShowFramePackage(const FFramePackage& Package, const FColor& Color);
 
+	void ServerSideRewind(class ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	void SaveFramePackage(FFramePackage& Package);
+
+	FFramePackage InterpBetweenFrames(const FFramePackage& OlderFrame, const FFramePackage& YoungerFrame, float HitTime);
 
 private:
 
