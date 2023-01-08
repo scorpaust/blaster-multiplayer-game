@@ -6,6 +6,8 @@
 #include "Components/BoxComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blaster/Weapon/Weapon.h"
 
 // Sets default values for this component's properties
 ULagCompensationComponent::ULagCompensationComponent()
@@ -61,6 +63,13 @@ void ULagCompensationComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	SaveFramePackage();
+}
+
+void ULagCompensationComponent::SaveFramePackage()
+{
+	if (Character == nullptr || !Character->HasAuthority()) return;
+
 	if (FrameHistory.Num() <= 1)
 	{
 		FFramePackage ThisFrame;
@@ -86,7 +95,7 @@ void ULagCompensationComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 		FrameHistory.AddHead(ThisFrame);
 
-		ShowFramePackage(ThisFrame, FColor::Red);
+		// ShowFramePackage(ThisFrame, FColor::Red);
 	}
 }
 
@@ -340,4 +349,14 @@ FServerSideRewindResult ULagCompensationComponent::ConfirmHit(const FFramePackag
 	EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
 
 	return FServerSideRewindResult{ false, false };
+}
+
+void ULagCompensationComponent::ServerScoreRequest_Implementation(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime, class AWeapon* DamageCauser)
+{
+	FServerSideRewindResult Confirm = ServerSideRewind(HitCharacter, TraceStart, HitLocation, HitTime);
+
+	if (Character && HitCharacter && Confirm.bHitConfirmed)
+	{
+		UGameplayStatics::ApplyDamage(HitCharacter, DamageCauser->GetDamage(), Character->Controller, DamageCauser, UDamageType::StaticClass());
+	}
 }

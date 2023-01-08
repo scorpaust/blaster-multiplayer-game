@@ -139,6 +139,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
 	float SphereRadius = 75.f;
 
+	UPROPERTY(EditAnywhere)
+	float Damage = 20.f;
+
+	UPROPERTY(EditAnywhere)
+	bool bUseServerSideRewind = false;
+
+	UPROPERTY()
+	class ABlasterCharacter* BlasterOwnerCharacter;
+
+	UPROPERTY()
+	class ABlasterPlayerController* BlasterOwnerController;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
@@ -182,12 +194,6 @@ private:
 	// Incremented in SpendRound, decremented in ClientUpdateAmmo
 	int32 Sequence = 0;
 
-	UPROPERTY()
-	class ABlasterCharacter* BlasterOwnerCharacter;
-
-	UPROPERTY()
-	class ABlasterPlayerController* BlasterOwnerController;
-
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
 
@@ -213,6 +219,8 @@ public:
 	FORCEINLINE int32 GetMagCapacity() const { return MagCapacity; }
 
 	FORCEINLINE UTexture2D* GetWeaponTexture() const { return WeaponTexture; }
+
+	FORCEINLINE float GetDamage() const { return Damage; }
 
 	bool IsEmpty();
 
