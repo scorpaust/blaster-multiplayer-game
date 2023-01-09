@@ -618,7 +618,7 @@ void ABlasterPlayerController::CheckPing(float DeltaTime)
 
 		if (PlayerState)
 		{
-			if (PlayerState->GetPing() * 4 > HighPingThreshold)
+			if (PlayerState->GetCompressedPing() * 4 > HighPingThreshold)
 			{
 				HighPingWarning();
 
