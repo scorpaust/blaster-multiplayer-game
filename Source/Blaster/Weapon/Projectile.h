@@ -33,6 +33,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	float InitialSpeed = 15000.f;
 
+	float Damage = 20.f;
 
 protected:
 	// Called when the game starts or when spawned
@@ -59,9 +60,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	class USoundCue* ImpactSound;
-
-	UPROPERTY(EditAnywhere)
-	float Damage = 20.f;
 
 	UPROPERTY(EditAnywhere)
 	class UNiagaraSystem* TrailSystem;
