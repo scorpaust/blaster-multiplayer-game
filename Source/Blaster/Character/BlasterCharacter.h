@@ -29,6 +29,10 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
+	/*
+	* Play montages
+	*/
+
 	void PlayFireMontage(bool bAiming);
 
 	void PlayReloadMontage();
@@ -36,6 +40,8 @@ public:
 	void PlayElimMontage();
 
 	void PlayThrowGrenadeMontage();
+
+	void PlaySwapMontage();
 
 	virtual void OnRep_ReplicatedMovement() override;
 
@@ -133,6 +139,8 @@ public:
 
 	UPROPERTY()
 	TMap<FName, class UBoxComponent*> HitCollisionBoxes;
+
+	bool bFinishedSwapping = false;
 
 protected:
 
@@ -248,6 +256,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	class UAnimMontage* ThrowGrenadeMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	class UAnimMontage* SwapMontage;
 
 	void HideCameraIfCharacterClose();
 
