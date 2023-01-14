@@ -10,6 +10,8 @@
 #include "Blaster/BlasterTypes/CombatState.h"
 #include "BlasterCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
+
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
@@ -45,7 +47,7 @@ public:
 
 	virtual void OnRep_ReplicatedMovement() override;
 
-	void Elim();
+	void Elim(bool bPlayerLeftGame);
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
@@ -60,7 +62,7 @@ public:
 	FVector GetHitTarget() const;
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastElim();
+	void MulticastElim(bool bPlayerLeftGame);
 
 	virtual void Destroyed() override;
 
@@ -141,6 +143,11 @@ public:
 	TMap<FName, class UBoxComponent*> HitCollisionBoxes;
 
 	bool bFinishedSwapping = false;
+
+	UFUNCTION(Server, Reliable)
+	void ServerLeaveGame();
+
+	FOnLeftGame OnLeftGame;
 
 protected:
 
@@ -316,6 +323,8 @@ private:
 	float ElimDelay = 3.f;
 
 	void ElimTimerFinished();
+
+	bool bLeftGame = false;
 
 	/**
 	* Dissolve Effect

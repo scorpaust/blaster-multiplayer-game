@@ -98,7 +98,7 @@ void ABlasterGameMode::PlayerEliminated(class ABlasterCharacter* EliminatedChara
 
 	if (EliminatedCharacter)
 	{
-		EliminatedCharacter->Elim();
+		EliminatedCharacter->Elim(false);
 	}
 }
 
@@ -120,5 +120,24 @@ void ABlasterGameMode::RequestRespawn(class ACharacter* EliminatedCharacter, cla
 		int32 Selection = FMath::RandRange(0, PlayerStarts.Num() - 1);
 
 		RestartPlayerAtPlayerStart(EliminatedController, PlayerStarts[Selection]);
+	}
+}
+
+void ABlasterGameMode::PlayerLeftGame(ABlasterPlayerState* PlayerLeaving)
+{
+	if (PlayerLeaving == nullptr) return;
+
+	ABlasterGameState* BlasterGameState = GetGameState<ABlasterGameState>();
+
+	if (BlasterGameState && BlasterGameState->TopScoringPlayers.Contains(PlayerLeaving))
+	{
+		BlasterGameState->TopScoringPlayers.Remove(PlayerLeaving);
+	}
+
+	ABlasterCharacter* CharacterLeaving = Cast<ABlasterCharacter>(PlayerLeaving->GetPawn());
+
+	if (CharacterLeaving)
+	{
+		CharacterLeaving->Elim(true);
 	}
 }
