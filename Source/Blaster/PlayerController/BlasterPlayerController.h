@@ -64,6 +64,10 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void SetupInputComponent() override;
+
+	void ShowReturnToMainMenu();
+	
 	void SetHUDTime();
 
 	void PollInit();
@@ -109,6 +113,18 @@ private:
 
 	UPROPERTY()
 	class ABlasterGameMode* BlasterGameMode;
+
+	/**
+	* Return to Main Menu
+	*/
+
+	UPROPERTY(EditAnywhere, Category = HUD)
+	TSubclassOf<class UUserWidget> ReturnToMainMenuWidget;
+
+	UPROPERTY()
+	class UReturnToMainMenu* ReturnToMainMenu;
+
+	bool bReturnToMainMenuOpen = false;
 
 	float LevelStartingTime = 0.f;
 
