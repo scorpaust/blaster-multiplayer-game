@@ -142,6 +142,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.f;
 
+	UPROPERTY(EditAnywhere)
+	float HeadShotDamage = 40.f;
+
 	UPROPERTY(Replicated, EditAnywhere)
 	bool bUseServerSideRewind = false;
 
@@ -224,6 +227,8 @@ public:
 	FORCEINLINE UTexture2D* GetWeaponTexture() const { return WeaponTexture; }
 
 	FORCEINLINE float GetDamage() const { return Damage; }
+
+	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }
 
 	bool IsEmpty();
 

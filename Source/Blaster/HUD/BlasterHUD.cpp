@@ -6,6 +6,9 @@
 #include "CharacterOverlay.h"
 #include "Announcement.h"
 #include "ElimAnnouncement.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/HorizontalBox.h"
+#include "Components/CanvasPanelSlot.h"
 
 void ABlasterHUD::BeginPlay()
 {
@@ -49,7 +52,42 @@ void ABlasterHUD::AddElimAnnouncement(FString Attacker, FString Victim)
 			ElimAnnouncementWidget->SetElimAnnouncementText(Attacker, Victim);
 
 			ElimAnnouncementWidget->AddToViewport();
+
+			ElimMessages.Add(ElimAnnouncementWidget);
+
+			for (UElimAnnouncement* Message : ElimMessages)
+			{
+				if (Message && Message->AnnouncementBox)
+				{
+					UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Message->AnnouncementBox);
+
+					if (CanvasSlot)
+					{
+						FVector2D Position = CanvasSlot->GetPosition();
+
+						FVector2D NewPosition(CanvasSlot->GetPosition().X, Position.Y - CanvasSlot->GetSize().Y);
+
+						CanvasSlot->SetPosition(NewPosition);
+					}
+				}
+			}
+
+			FTimerHandle ElimMsgTimer;
+
+			FTimerDelegate ElimMsgDelegate;
+
+			ElimMsgDelegate.BindUFunction(this, FName("ElimAnnouncementTimerFinished"), ElimAnnouncementWidget);
+
+			GetWorldTimerManager().SetTimer(ElimMsgTimer, ElimMsgDelegate, ElimAnnouncementTime, false);
 		}
+	}
+}
+
+void ABlasterHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove)
+{
+	if (MsgToRemove)
+	{
+		MsgToRemove->RemoveFromParent();
 	}
 }
 
