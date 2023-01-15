@@ -44,6 +44,8 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 					SpawnedProjectile->bUseServerSideRewind = false;
 
 					SpawnedProjectile->Damage = Damage;
+
+					SpawnedProjectile->HeadShotDamage = HeadShotDamage;
 				}
 				else // Server, not locally controlled - spawn non replicated projectile, no SSR
 				{
@@ -64,7 +66,6 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 
 					SpawnedProjectile->InitialVelocity = SpawnedProjectile->GetActorForwardVector() * SpawnedProjectile->InitialSpeed;
 
-					SpawnedProjectile->Damage = Damage;
 				}
 				else // Client, not locally controlled -> spawn non replicated projectile, no SSR
 				{
