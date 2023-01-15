@@ -9,10 +9,45 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/HorizontalBox.h"
 #include "Components/CanvasPanelSlot.h"
+#include "SChatSystemWidget.h"
+#include "Blaster/PlayerState/BlasterPlayerState.h"
+#include "Widgets/SWeakWidget.h"
 
 void ABlasterHUD::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ABlasterHUD::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (GEngine && GEngine->GameViewport) // make sure our screen is ready for the widget
+	{
+		SAssignNew(ChatSystemWidget, SChatSystemWidget).OwnerHUD(this); // add the widget and assign it to the var
+		GEngine->GameViewport->AddViewportWidgetContent(SNew(SWeakWidget).PossiblyNullContent(ChatSystemWidget.ToSharedRef()));
+	}
+}
+
+void ABlasterHUD::AddMessageBP(const int32 Type, const FString& Username, const FString& Text, const bool Replicate)
+{
+	if (!OwningPlayer || !ChatSystemWidget.IsValid())
+		return;
+
+	FSChatMsg newmessage;
+
+	newmessage.Init(Type, FText::FromString(Username), FText::FromString(Text)); // initialize our struct and prep the message
+	if (newmessage.Type > 0)
+		if (Replicate)
+		{
+			ABlasterPlayerState* BlasterState = Cast<ABlasterPlayerState>(OwningPlayer->PlayerState);
+			
+			if (BlasterState)
+				
+				BlasterState->UserChatRPC(newmessage); // Send the complete chat message to the PlayerState so it can be replicated then displayed
+		}
+		else
+			ChatSystemWidget->AddMessage(newmessage); // Send a local message to this client only, no one else receives it
 }
 
 void ABlasterHUD::AddCharacterOverlay()
@@ -140,6 +175,18 @@ void ABlasterHUD::DrawHUD()
 			DrawCrosshair(HUDPackage.CrosshairsBottom, ViewportCenter, Spread, HUDPackage.CrosshairsColor);
 		}
 	}
+
+	if (!OwningPlayer)
+	{
+		OwningPlayer = OwningPlayer == nullptr ? GetOwningPlayerController() : OwningPlayer;
+
+		AddMessageBP(2, TEXT(""), TEXT("Welcome. Press Enter to chat."), false); // random Welcome message shown to the local player. To be deleted. note type 2 is system message and username is blank
+		return;
+	}
+
+	if (OwningPlayer->WasInputKeyJustPressed(EKeys::Enter))
+		if (ChatSystemWidget.IsValid() && ChatSystemWidget->ChatInput.IsValid())
+			FSlateApplication::Get().SetKeyboardFocus(ChatSystemWidget->ChatInput); // When the user presses Enter he will focus his keypresses on the chat input bar
 }
 
 void ABlasterHUD::DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter, FVector2D Spread, FLinearColor CrosshairColor)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "Blaster/HUD/BlasterHUD.h"
 #include "BlasterPlayerState.generated.h"
 
 /**
@@ -15,6 +16,12 @@ class BLASTER_API ABlasterPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
+
+	UFUNCTION(Server, Reliable, WithValidation) // for player to player rpc you need to first call the message on the server
+	virtual void UserChatRPC(const FSChatMsg& newmessage); // first rpc for the server
+	
+	UFUNCTION(NetMulticast, Reliable, WithValidation) // then the server calls the function with a multicast that executes on all clients and the server
+	virtual void UserChat(const FSChatMsg& newmessage); // second rpc for all the clients
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

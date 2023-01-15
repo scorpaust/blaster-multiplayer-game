@@ -8,6 +8,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "Blaster/PlayerState/BlasterPlayerState.h"
 #include "Blaster/GameState/BlasterGameState.h"
+#include "Blaster/HUD/BlasterHUD.h"
+#include "Blaster/PlayerState/BlasterPlayerState.h"
 
 namespace MatchState
 {
@@ -17,6 +19,9 @@ namespace MatchState
 ABlasterGameMode::ABlasterGameMode()
 {
 	bDelayedStart = true;
+
+	HUDClass = ABlasterHUD::StaticClass();
+	PlayerStateClass = ABlasterPlayerState::StaticClass();
 }
 
 void ABlasterGameMode::BeginPlay()

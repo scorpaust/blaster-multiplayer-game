@@ -5,6 +5,7 @@
 #include "Blaster/Character/BlasterCharacter.h"
 #include "Blaster/PlayerController/BlasterPlayerController.h"
 #include "Net/UnrealNetwork.h"
+#include "Blaster/HUD/SChatSystemWidget.h"
 
 void ABlasterPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
@@ -75,6 +76,41 @@ void ABlasterPlayerState::OnRep_Defeats()
 		if (Controller)
 		{
 			Controller->SetHUDDefeats(Defeats);
+		}
+	}
+}
+
+bool ABlasterPlayerState::UserChatRPC_Validate(const FSChatMsg& newmessage)
+{
+	return true;
+}
+
+void ABlasterPlayerState::UserChatRPC_Implementation(const FSChatMsg& newmessage)
+{
+	UserChat(newmessage);
+}
+
+bool ABlasterPlayerState::UserChat_Validate(const FSChatMsg& newmessage)
+{
+	return true;
+}
+
+void ABlasterPlayerState::UserChat_Implementation(const FSChatMsg& newmessage)
+{
+	ABlasterPlayerController* BlasterController;
+	ABlasterHUD* BlasterHUD;
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator) // find all controllers
+	{
+		BlasterController = Cast<ABlasterPlayerController>(*Iterator);
+		
+		if (BlasterController)
+		{
+			BlasterHUD = Cast<ABlasterHUD>(BlasterController->GetHUD());
+
+			if (BlasterHUD && BlasterHUD->ChatSystemWidget.IsValid())
+				
+				BlasterHUD->ChatSystemWidget->AddMessage(newmessage); // place the chat message on this player controller
 		}
 	}
 }
