@@ -60,6 +60,8 @@ public:
 
 	FHighPingDelegate HighPingDelegate;
 
+	void BroadcastElim(APlayerState* Attacker, APlayerState* Victim);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -105,6 +107,9 @@ protected:
 	void StopHighPingWarning();
 
 	void CheckPing(float DeltaTime);
+
+	UFUNCTION(Client, Reliable)
+	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
 
 private:
 
