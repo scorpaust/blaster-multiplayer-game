@@ -450,6 +450,8 @@ void UCombatComponent::EquipSecondaryWeapon(AWeapon* WeaponToEquip)
 
 	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
 
+	EquippedWeapon->SetHUDWeaponTexture();
+
 	AttachActorToBackpack(WeaponToEquip);
 
 	PlayEquipWeaponSound(WeaponToEquip);

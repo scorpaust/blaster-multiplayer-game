@@ -80,8 +80,9 @@ public:
 
 	void UpdateHUDAmmo();
 
-	void SpawnDefaultWeapon();
+	void UpdateHUDImage();
 
+	void SpawnDefaultWeapon();
 
 	/**
 	* Hit boxes used for server side rewind

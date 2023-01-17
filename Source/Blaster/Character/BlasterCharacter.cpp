@@ -243,7 +243,7 @@ void ABlasterCharacter::MulticastGainedTheLead_Implementation()
 
 	if (CrownComponent == nullptr)
 	{
-		CrownComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(CrownSystem, GetCapsuleComponent(), FName(), GetActorLocation() + FVector(0.f, 0.f, 110.f), GetActorRotation(), EAttachLocation::KeepWorldPosition, false);
+		CrownComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(CrownSystem, GetMesh(), FName(), GetActorLocation() + FVector(0.f, 0.f, 110.f), GetActorRotation(), EAttachLocation::KeepWorldPosition, false);
 	}
 
 	if (CrownComponent)
@@ -268,10 +268,12 @@ void ABlasterCharacter::BeginPlay()
 	SpawnDefaultWeapon();
 
 	UpdateHUDAmmo();
-	
+
 	UpdateHUDHealth();
 
 	UpdateHUDShield();
+
+	UpdateHUDImage();
 
 	if (HasAuthority())
 	{
@@ -316,6 +318,16 @@ void ABlasterCharacter::UpdateHUDAmmo()
 	}
 }
 
+void ABlasterCharacter::UpdateHUDImage()
+{
+	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+
+	if (BlasterPlayerController && Combat && Combat->EquippedWeapon && Combat->EquippedWeapon->GetWeaponTexture())
+	{
+		BlasterPlayerController->SetHUDWeaponTexture(Combat->EquippedWeapon->GetWeaponTexture());
+	}
+}
+
 void ABlasterCharacter::SpawnDefaultWeapon()
 {
 	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
@@ -323,12 +335,12 @@ void ABlasterCharacter::SpawnDefaultWeapon()
 	UWorld* World = GetWorld();
 
 	if (BlasterGameMode && World && !bEliminated && DefaultWeaponClass)
-	{
+	{	
 		AWeapon* StartingWeapon = World->SpawnActor<AWeapon>(DefaultWeaponClass);
-		
+
 		StartingWeapon->bDestroyWeapon = true;
 
-		if (Combat)
+		if (Combat )
 		{
 			Combat->EquipWeapon(StartingWeapon);
 		}
@@ -639,6 +651,8 @@ void ABlasterCharacter::MulticastElim_Implementation(bool bPlayerLeftGame)
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	AttachedGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Spawn Elim Bot
 	if (ElimBotEffect)
@@ -1113,6 +1127,11 @@ void ABlasterCharacter::HideCameraIfCharacterClose()
 		{
 			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
 		}
+
+		if (Combat && Combat->SecondaryWeapon && Combat->SecondaryWeapon->GetWeaponMesh())
+		{
+			Combat->SecondaryWeapon->GetWeaponMesh()->bOwnerNoSee = true;
+		}
 	}
 	else
 	{
@@ -1121,6 +1140,11 @@ void ABlasterCharacter::HideCameraIfCharacterClose()
 		if (Combat && Combat->EquippedWeapon && Combat->EquippedWeapon->GetWeaponMesh())
 		{
 			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
+		}
+
+		if (Combat && Combat->SecondaryWeapon && Combat->SecondaryWeapon->GetWeaponMesh())
+		{
+			Combat->SecondaryWeapon->GetWeaponMesh()->bOwnerNoSee = false;
 		}
 	}
 }
