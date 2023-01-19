@@ -31,6 +31,8 @@ public:
 
 	void PlayerLeftGame(class ABlasterPlayerState* PlayerLeaving);
 
+	virtual float CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage);
+
 	UPROPERTY(EditDefaultsOnly)
 	float WarmUpTime = 10.f;
 
@@ -41,6 +43,8 @@ public:
 	float CooldownTime = 10.f;
 
 	float LevelStartingTime = 0.f;
+
+	bool bTeamsMatch = false;
 
 protected:
 

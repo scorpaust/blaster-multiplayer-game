@@ -44,15 +44,23 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	void HideTeamScores();
+
+	void InitTeamScores();
+
+	void SetHUDRedTeamScore(int32 RedScore);
+
+	void SetHUDBlueTeamScore(int32 BlueScore);
+
 	// Synced with server world clock
 	virtual float GetServerTime();
 
 	// Sync with server clock as soon as possible
 	virtual void ReceivedPlayer() override;
 
-	void OnMatchStateSet(FName State);
+	void OnMatchStateSet(FName State, bool bTeamsMatch = false);
 
-	void HandleMatchHasStarted();
+	void HandleMatchHasStarted(bool bTeamsMatch = false);
 
 	void HandleCooldown();
 
@@ -110,6 +118,12 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
+
+	UPROPERTY(ReplicatedUsing=OnRep_ShowTeamScores)
+	bool bShowTeamScores = false;
+
+	UFUNCTION()
+	void OnRep_ShowTeamScores();
 
 private:
 

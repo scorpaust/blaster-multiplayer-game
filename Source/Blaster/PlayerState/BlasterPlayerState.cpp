@@ -116,3 +116,25 @@ void ABlasterPlayerState::UserChat_Implementation(const FSChatMsg& newmessage)
 		}
 	}
 }
+
+void ABlasterPlayerState::OnRep_Team()
+{
+	ABlasterCharacter* BCharacter = Cast<ABlasterCharacter>(GetPawn());
+
+	if (BCharacter)
+	{
+		BCharacter->SetTeamColor(Team);
+	}
+}
+
+void ABlasterPlayerState::SetTeam(ETeam TeamToSet)
+{
+	Team = TeamToSet;
+
+	ABlasterCharacter* BCharacter = Cast<ABlasterCharacter>(GetPawn());
+
+	if (BCharacter)
+	{
+		BCharacter->SetTeamColor(Team);
+	}
+}
