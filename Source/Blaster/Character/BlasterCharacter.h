@@ -212,6 +212,10 @@ protected:
 
 	void DropOrDestroyWeapons();
 
+	void SetSpawnPoint();
+
+	void OnPlayerStateInitialized();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
