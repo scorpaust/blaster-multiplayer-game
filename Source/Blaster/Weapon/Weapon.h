@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "WeaponTypes.h"
+#include "Blaster/BlasterTypes/Team.h"
 #include "Weapon.generated.h"
 
 UENUM(BlueprintType)
@@ -52,7 +53,7 @@ public:
 
 	FVector TraceEndWithScatter(const FVector& HitTarget);
 
-	void Dropped();
+	virtual void Dropped();
 
 	void AddAmmo(int32 AmmoToAdd);
 
@@ -204,6 +205,9 @@ private:
 	EWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere)
+	ETeam Team;
+
+	UPROPERTY(EditAnywhere)
 	UTexture2D* WeaponTexture;
 
 public:
@@ -213,6 +217,8 @@ public:
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+
+	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 
 	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
 

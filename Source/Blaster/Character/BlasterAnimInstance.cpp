@@ -50,6 +50,8 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	bEliminated = BlasterCharacter->IsEliminated();
 
+	bHoldingTheFlag = BlasterCharacter->IsHoldingTheFlag();
+
 	// Offset Yaw for Strafing
 	FRotator AimRotation = BlasterCharacter->GetBaseAimRotation();
 

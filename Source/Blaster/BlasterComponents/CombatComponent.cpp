@@ -44,6 +44,8 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, CombatState);
 
 	DOREPLIFETIME(UCombatComponent, Grenades);
+
+	DOREPLIFETIME(UCombatComponent, bHoldingTheFlag);
 }
 
 void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
@@ -405,18 +407,34 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 	if (CombatState != ECombatState::ECS_Unoccupied) return;
 
-	if (EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+	if (WeaponToEquip->GetWeaponType() == EWeaponType::EWT_Flag)
 	{
-		EquipSecondaryWeapon(WeaponToEquip);
+		Character->Crouch();
+
+		bHoldingTheFlag = true;
+
+		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
+
+		AttachFlagToLeftHand(WeaponToEquip);
+
+		WeaponToEquip->SetOwner(Character);
+
 	}
 	else
 	{
-		EquipPrimaryWeapon(WeaponToEquip);
-	}
-	
-	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		if (EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+		{
+			EquipSecondaryWeapon(WeaponToEquip);
+		}
+		else
+		{
+			EquipPrimaryWeapon(WeaponToEquip);
+		}
 
-	Character->bUseControllerRotationYaw = true;
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+
+		Character->bUseControllerRotationYaw = true;
+	}
 }
 
 void UCombatComponent::EquipPrimaryWeapon(AWeapon* WeaponToEquip)
@@ -492,6 +510,18 @@ void UCombatComponent::AttachActorToLeftHand(AActor* ActorToAttach)
 	if (HandSocket)
 	{ 
 		HandSocket->AttachActor(ActorToAttach, Character->GetMesh());
+	}
+}
+
+void UCombatComponent::AttachFlagToLeftHand(AWeapon* Flag)
+{
+	if (Character == nullptr || Character->GetMesh() == nullptr || Flag == nullptr) return;
+
+	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("FlagSocket"));
+
+	if (HandSocket)
+	{
+		HandSocket->AttachActor(Flag, Character->GetMesh());
 	}
 }
 
@@ -1014,6 +1044,14 @@ void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 	if (Character)
 	{
 		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
+}
+
+void UCombatComponent::OnRep_HoldingTheFlag()
+{
+	if (bHoldingTheFlag && Character && Character->IsLocallyControlled())
+	{
+		Character->Crouch();
 	}
 }
 

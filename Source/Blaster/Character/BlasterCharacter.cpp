@@ -174,7 +174,6 @@ ABlasterCharacter::ABlasterCharacter()
 	HitCollisionBoxes.Add(FName("backpack"), Backpack);
 
 	Thigh_l = CreateDefaultSubobject<UBoxComponent>(TEXT("Thigh_l"));
-
 	Thigh_l->SetupAttachment(GetMesh(), FName("thigh_l"));
 
 	HitCollisionBoxes.Add(FName("thigh_l"), Thigh_l);
@@ -364,6 +363,8 @@ void ABlasterCharacter::SpawnDefaultWeapon()
 		if (Combat )
 		{
 			Combat->EquipWeapon(StartingWeapon);
+
+			Combat->EquippedWeapon->SetHUDAmmo();
 		}
 	}
 }
@@ -382,6 +383,17 @@ void ABlasterCharacter::Tick(float DeltaTime)
 
 void ABlasterCharacter::RotateInPlace(float DeltaTime)
 {
+	if (Combat && Combat->bHoldingTheFlag)
+	{
+		bUseControllerRotationYaw = false;
+
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+
+		return;
+	}
+
 	if (bDisableGameplay)
 	{
 		bUseControllerRotationYaw = false;
@@ -874,6 +886,8 @@ void ABlasterCharacter::EquipButtonPressed()
 
 	if (Combat)
 	{
+		if (Combat->bHoldingTheFlag) return;
+
 		if (Combat->CombatState == ECombatState::ECS_Unoccupied) ServerEquipButtonPressed();
 
 		bool bSwap = Combat->ShouldSwapWeapons() && !HasAuthority() && Combat->CombatState == ECombatState::ECS_Unoccupied && OverlappingWeapon == nullptr;
@@ -919,6 +933,8 @@ void ABlasterCharacter::ServerEquipButtonPressed_Implementation()
 
 void ABlasterCharacter::CrouchButtonPressed()
 {
+	if (Combat && Combat->bHoldingTheFlag) return;
+
 	if (bDisableGameplay) return;
 
 	if (bIsCrouched)
@@ -935,6 +951,8 @@ void ABlasterCharacter::ReloadButtonPressed()
 {
 	if (bDisableGameplay) return;
 
+	if (Combat && Combat->bHoldingTheFlag) return;
+
 	if (Combat)
 	{
 		Combat->Reload();
@@ -945,6 +963,8 @@ void ABlasterCharacter::AimButtonPressed()
 {
 	if (bDisableGameplay) return;
 
+	if (Combat && Combat->bHoldingTheFlag) return;
+
 	if (Combat)
 	{
 		Combat->SetAiming(true);
@@ -954,6 +974,8 @@ void ABlasterCharacter::AimButtonPressed()
 void ABlasterCharacter::AimButtonReleased()
 {
 	if (bDisableGameplay) return;
+
+	if (Combat && Combat->bHoldingTheFlag) return;
 
 	if (Combat)
 	{
@@ -1074,6 +1096,8 @@ void ABlasterCharacter::SimProxiesTurn()
 
 void ABlasterCharacter::Jump()
 {
+	if (Combat && Combat->bHoldingTheFlag) return;
+
 	if (bDisableGameplay) return;
 
 	if (bIsCrouched)
@@ -1090,6 +1114,8 @@ void ABlasterCharacter::FireButtonPressed()
 {
 	if (bDisableGameplay) return;
 
+	if (Combat && Combat->bHoldingTheFlag) return;
+
 	if (Combat)
 	{
 		Combat->FireButtonPressed(true);
@@ -1099,6 +1125,8 @@ void ABlasterCharacter::FireButtonPressed()
 void ABlasterCharacter::FireButtonReleased()
 {
 	if (bDisableGameplay) return;
+
+	if (Combat && Combat->bHoldingTheFlag) return;
 
 	if (Combat)
 	{
@@ -1110,6 +1138,8 @@ void ABlasterCharacter::GrenadeButtonPressed()
 {
 	if (Combat)
 	{
+		if (Combat->bHoldingTheFlag) return;
+
 		Combat->ThrowGrenade();
 	}
 }
@@ -1258,4 +1288,20 @@ ECombatState ABlasterCharacter::GetCombatState() const
 	if (Combat == nullptr) return ECombatState::ECS_MAX;
 
 	return Combat->CombatState;
+}
+
+bool ABlasterCharacter::IsHoldingTheFlag() const
+{
+	if (Combat == nullptr) return false;
+
+	return Combat->bHoldingTheFlag;
+}
+
+ETeam ABlasterCharacter::GetTeam()
+{
+	BlasterPlayerState = BlasterPlayerState == nullptr ? GetPlayerState<ABlasterPlayerState>() : BlasterPlayerState;
+
+	if (BlasterPlayerState == nullptr) return ETeam::ET_NoTeam;
+
+	return BlasterPlayerState->GetTeam();
 }
