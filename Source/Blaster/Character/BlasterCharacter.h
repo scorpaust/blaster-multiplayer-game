@@ -463,10 +463,11 @@ public:
 
 	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
 
-	FORCEINLINE bool IsHoldingTheFlag() const;
+	bool IsHoldingTheFlag() const;
 
 	bool IsLocallyReloading();
 
 	ETeam GetTeam();
 
+	void SetHoldingTheFlag(bool bHolding);
 };

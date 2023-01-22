@@ -236,6 +236,8 @@ public:
 
 	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }
 
+	FORCEINLINE ETeam GetTeam() const { return Team; }
+
 	bool IsEmpty();
 
 	bool IsFull();

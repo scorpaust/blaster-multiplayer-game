@@ -18,7 +18,11 @@ public:
 
 	AFlag();
 
+	virtual void BeginPlay() override;
+
 	virtual void Dropped() override;
+
+	void ResetFlag();
 
 protected:
 
@@ -30,5 +34,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* FlagMesh;
+
+	FTransform InitialTransform;
+
+public:
+
+	FORCEINLINE FTransform GetInitialTransform() const { return InitialTransform; }
 
 };
